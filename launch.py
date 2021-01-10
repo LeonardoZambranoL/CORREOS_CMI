@@ -123,24 +123,28 @@ def modifier(func_1):
     #Iniciar Ventana
     modificar.mainloop()
 
-def read_info():
-    key=b'xMDD8sukJkSrRd_2q78M9vM8xJX87F4Kc-tS6Dgb2Cg='
+# claves de read_info() y guardar() deben coincidir
     
-
-    try:
-        with open("./info/IBPC.txt","r") as f:
-            f_2=Fernet(key)
-            datos=f.readlines()
-            datos=[f_2.decrypt(f_2.decrypt(a.strip().encode())).decode() for a in datos]  
-          
-    except:
-        
-        datos=["","","","","","",""]
-
-    return datos
-
-def guardar(app,datos):
-    key=b'xMDD8sukJkSrRd_2q78M9vM8xJX87F4Kc-tS6Dgb2Cg='
+def read_info():
+    #claro está, si te animas a usarlo recomiendo reemplazar esta clave por una propia
+    key=b'xMDD8sukJkSrRd_2q78M9vM8xJX87F4Kc-tS6Dgb2Cg='              #<-------------------------------------
+                                                                                                             #|
+                                                                                                              #|
+    try:                                                                                                       #|
+        with open("./info/IBPC.txt","r") as f:                                                                  #|
+            f_2=Fernet(key)                                                                                      #|
+            datos=f.readlines()                                                                                   #|
+            datos=[f_2.decrypt(f_2.decrypt(a.strip().encode())).decode() for a in datos]                           #|
+                                                                                                                    #| DEBEN COINCIDIR
+    except:                                                                                                         #| RECOMIENDO USAR UNA DIFERENTE
+                                                                                                                   #|
+        datos=["","","","","","",""]                                                                              #|
+                                                                                                                 #|
+    return datos                                                                                                #|
+                                                                                                               #|
+def guardar(app,datos):                                                                                       #|
+    #claro está, si te animas a usarlo recomiendo reemplazar esta clave por una propia                       #|
+    key=b'xMDD8sukJkSrRd_2q78M9vM8xJX87F4Kc-tS6Dgb2Cg='              #<-------------------------------------
 
 
     datos=[a.get() for a in datos]
