@@ -1,0 +1,96 @@
+**ESTA APLICACIÓN FUE CREADA PARA LA CMI Y SU USO DEBERÁ DE MANTENERSE RESERVADO A EVENTOS PEQUEÑOS**
+
+SETUP:
+
+Para poder usar el programa, deberá de tener acceso a una base de datos hosteada con MySQL Server. Si usted no posee una base de datos, recomiendo usar "MySQL installer - Community" e instalar los productos: MySQL Server, Connector/Python, MySQL Notifier, MySQL Workbench y MySQL For Excel para montar una base de datos propia (la instalación de estos productos es gratuita).
+
+TIP: Puede crear una tabla en Excel y exportarla a la base de datos usando la herramienta "MySQL for Excel" en "Datos".
+Por cómo fue hecho el código, la primera columna de la tabla (de izquierda a derecha) deberá de ser un primary key (para nuestra olimpiada, utilizamos el código del participante para esta columna), la segunda deberá contener el nombre de la persona y la tercera su correo electrónico. Añadir otras columnas es posible, pero no seguir este orden con las 3 primeras seguramente causará problemas y errores.
+
+
+Otro requisito básico para usar la aplicación es permitir el acceso de aplicaciones menos seguras a su correo electrónico, esto es para permitir que Python pueda tener acceso a su correo para enviar los correos. Esto se hace desde https://myaccount.google.com/lesssecureapps en caso de correos de Google.
+
+Una vez listo esto, deberá introducir su información en la aplicación, desde Opciones/MODIFICAR DATOS (la dirección smtp para correos de Google es smtp.gmail.com y el puerto es generalmente 465).
+
+
+PLANTILLAS Y ADJUNTOS:
+
+La creación de plantillas es posible desde la aplicación, desde Opciones/CREAR NUEVA PLANTILLA llene los campos y click en listo, y su plantilla ya estará lista. ¡ASEGURESE DE MANTENER EL SERVIDOR MySQL ENCENDIDO AL MOMENTO DE CREAR PLANTILLAS!, la razón se dará más adelante.
+Al momento de crear una nueva plantilla, debe de reiniciar la aplicación para que esta plantilla aparezca entre las opciones de "Nombre de Plantilla" en la app principal.
+
+Para modificar una plantilla existente, diríjase a Opciones/MODIFICAR PLANTILLA EXISTENTE, elija una plantilla y click en "Elegir", prontamente sus contenidos se mostrarán en los 2 cuadros de texto de la pantalla, desde aquí puede modificarlos, una vez haya terminado click en listo y los cambios se guardarán.
+
+Para añadir un adjunto a la lista de Archivos diríjase a Opciones/AÑADIR NUEVO ADJUNTO y cargue el archivo que desee (Puede que la aplicación se congele por un momento, pero esto es normal especialmente si el archivo es un poco pesado).
+
+
+ENVIAR CORREOS:
+
+(los correos se enviarán a la lista de contactos dentro de la Tabla de MySQL que usted introdujo por última vez en Opciones/MODIFICAR DATOS)
+
+Para enviar un correo simplemente escriba el Asunto del correo, elija una plantilla y click en INICIAR ENVIO.
+
+Si desea que el correo contenga archivos adjuntos, elija uno de la lista "ELIJA UN ARCHIVO" y click en AÑADIR, repita esto para todos los archivos que desee adjuntar (el peso máximo de los adjuntos deberá ser menor a 25 Mb, adjuntos más pesados a esto no son soportados y el error "You have Exceeded Google's message size limits" saltará para usuarios de Gmail). Este proceso debe de seguirse antes de dar click a INICIAR ENVIO. Por el momento escoja la opción NO, más tarde profundizaremos en los posibles usos del programa.
+	
+
+INTERFAZ:
+
+La sección "PROGRESO" muestra la cantidad de correos a los cuales se intentó realizar un envío junto al total de correos a ser enviados.
+Si por ejemplo la base de datos cuenta con 200 correos y el código apenas se puso a correr, mostrará "0 de 200", esta información se actualizará de manera constante. Así por ejemplo después de un momento, podría mostrar "25 de 200" queriendo decir que ya se intentó enviar el correo a los primeros 25 destinatarios. Siguiendo el ejemplo anterior, al finalizar el envío, mostrará "200 de 200".
+
+La sección "AVISOS" mostrará el estado actual del envío, similarmente esta sección se actualiza constantemente. Mostrará información sobre cada uno de los intentos de envío bajo el formato "Base de datos Actualizada | ENVIADO | [CÓDIGO DEL DESTIANTARIO]" en caso de un envío exitoso y "Base de datos Actualizada | ERROR | [CÓDIGO DEL DESTIANTARIO] + Descripción del error en cuestión" en caso de un envío fallido. Así mismo en caso de ocurrir un error durante la ejecución del programa, el mensaje de error correspondiente será mostrado en esta sección. Una vez termine el envió, mostrará "---------FIN---------". De vez en cuando se mostrará el mensaje "---------ENVIANDO---------", este mensaje puede ignorarlo. (este mensaje se muestra cuando el programa se reinicia (o inicia por primera vez), esto ocurre en caso de un error fatal, cuando cambia la hora (de 8 pm a 9 pm, por ejemplo) o cuando todos los correos en memoria ya fueron enviados. En caso de un error fatal, un registro del error será guardado (más información abajo) y el programa procederá a reiniciarse automáticamente para seguir enviando correos a los demás contactos. La otra situación es que el programa esté "refilleando" la lista de correos a mandar (cada hora se toma parte de los correos en la base de datos y se guardan dentro de una variable de tipo "list" en memoria. Una vez se termina la hora, o los correos en dicha variable (después de cada intento de envío, la dirección a la que se intentó enviar el correo es borrada de memoria), el programa vuelve a pedir correos desde la base de datos. Esto se hace como un intento de no tener muchos correos en memoria al mismo tiempo.) la cantidad de correos que se piden en cada reinicio puede ser modificada desde el script "Enviar.py" línea 162 aproximadamente). 
+
+REGISTROS:
+
+El programa guarda registros de 2 maneras distintas:
+
+- en archivos .txt: 	en la carpeta ./Register/ {el nombre de tu plantilla} podrás ver q existen varios archivos de texto.
+
+			El archivo "YA ENVIADO" guarda las direcciones de correo a las cuales se envió un mail exitosamente
+
+			El archivo "NO ENVIADO" guarda las direcciones de correo a las cuales se intentó enviar un mail sin éxito.
+
+			Los archivos "{nombre de plantilla} + fecha y hora" guardan registro de todos los intentos de envío, exitosos o no. Estos 				archivos se generan después de cada reinicio del programa. En ellos se guarda la dirección de correo a la cual se intentó 				enviar un correo seguido de información sobre los intentos de adjuntar archivos y finalmente el mensaje "enviado" en caso de 				un envío exitoso o "error" en caso de no haber sido posible enviar el correo, adicionalmente en caso de error se adjunta el 				mensaje de error generado por Python.
+
+- en la base de datos:	recordarás que anteriormente pedí que el server de la base de datos esté encendido al momento de crear una nueva plantilla, 				esto es porque aquí también se guardan registros sobre el envío de correos. Al momento de crear una nueva plantilla también 				se creará una columna en la tabla que tenías seleccionada. Esta columna tendrá el mismo nombre que la plantilla.
+			En cada fila correspondiente a las direcciones a las cuales ya se intentó enviar un mail se escribirá en esta nueva columna 				el mensaje "ENVIADO" en caso de que el intento hallase sido exitoso y "ERROR" en caso contrario.
+
+
+TIPS EXTRA:
+
+Si deseas modificar datos, no debes de modificarlos todos a la vez. Digamos que lo único que deseas es de dirección de correo. En este caso dirígete a Opciones/MODIFICAR DATOS y rellena solo los campos correspondientes a "DIRECCION DE CORREO" y "CONTRASEÑA" dejando los demás campos en blanco y click en Listo. (El programa solo modifica los campos que tu rellenes. Es decir que, si tu abres este menú y decides dejar uno de los campos en blanco, el programa no modificará la información correspondiente a dicho campo)
+
+Si anteriormente creaste una plantilla para determinada tabla, pero ahora quieres poder usar esa plantilla para otra tabla solo cambia los datos desde Opciones/MODIFICAR DATOS para que coincidan con la base de datos y tabla nuevas y dirígete a Opciones/CREAR NUEVA PLANTILLA, aquí solo escribe el nombre de la plantilla que quieres poder reusar para la nueva tabla y click en LISTO. (Esto lo que causa es la creación de una nueva columna con el nombre de la plantilla en la nueva tabla, también se intentan crear los archivos .txt correspondientes a los contenidos de la plantilla, así como los archivos de registro, pero estos al ya existir causan un error internamente. Este error es ignorado por el programa así que no debería haber problema con ello)
+
+Puedes abrir la versión "launch con cmd" para ver mensajes detallados impresos en el cmd. Esto podría dar mas información que la que da la versión sin cmd en la sección "AVISOS"
+
+
+PARA PODER PERSONALIZAR LOS CORREOS; NECESITAS TENER ACCESO A LOS ARCHIVOS .PY  PARA PODER MODIFICARLOS Y RECONSTRUIR EL .EXE, SI ORGANIZAS LA CMI Y DESEAS PERSONALIZAR LOS CORREOS; AVISAME Y TE LOS MANDO   :)
+
+PERSONALIZACIÓN DE CORREOS:
+(necesitas saber un poco de Python para utilizar esta función)
+
+-Texto:
+(perdón, pero no pude idear un menú similar a MODIFICAR PLANTILLA, CREAR PLANTILLA NUEVA o MODIFICAR DATOS antes de la clausura de la olimpiada que se encargue de esto, así que para usar esta función tendrá que modificar el código de "func.py")
+
+Para personalizar el cuerpo de los correos se usa la clase "Template" de la librería "string" así que te recomendaría aprender lo básico de esta clase para poder personalizar tus correos.
+Los nombres de campos variables deben de estar escritos dentro las plantillas rodeados por ${}, por ejemplo, en la plantilla RESULTADOS puedes encontrar los campos ${NAME}, ${P1}, ${P2}, ${P3}, ${P4}, ${Total} y ${PREMIO}. Una vez ya hallases escrito tu plantilla con los campos que deseas personalizar, el siguiente paso es indicarle al programa con que llenar a dichos campos, esto puedes hacerlo desde el archivo "func.py" dentro de la función "send()" (aproximadamente en las líneas 102 y 105, las cuales deben decir: "msg.set_content((Template_contents[0]).substitute())" y "msg.add_alternative((Template_contents[1]).substitute(), subtype="html")" respectivamente. ). Aquí deberás escribir dentro del método ".substitude()" el nombre del campo a personalizar y el contenido que deseas que tenga. Por ejemplo, si uno de mis campos es ${FECHA}, yo puedo modificar el método ".substitude()" para que diga ".substitude(FECHA="9 de enero del 2021")", con esto al momento de mandar correos, el campo ${FECHA} será reemplazado con la fecha introducida.
+Recuerda que todos los campos a personalizar deben de coincidir, si en tu plantilla escribes ${SALUDO}, al momento de modificar el código debes de indicar con que rellenar ese campo, caso contrario no funcionará. Así mismo no puedes pasar información desde el código para rellenar un campo que no existe en la plantilla.
+
+-Adjuntos:
+(revisa la estructura de la tabla en "SETUP", al inicio de este documento)
+
+Para que los archivos adjuntos sean personalizados, debes de crear una carpeta nueva dentro de "./info/Atts" y dentro de ella debes de incluir todos los archivos, estos archivos deben de estar guardados como "CODIGO_DE_LA_PERSONA.pdf" donde el CODIGO_DE_LA_PERSONA corresponde a la primera columna de la tabla de MySQL que estés utilizando. Por ejemplo, puedes dirigirte a “. /info/Atts/PARTICIPACION", aquí podrás encontrar muchos archivos tipo pdf nombrados según los códigos de nuestros competidores.
+Una vez hallases creado la carpeta y puesto dentro de ella todos los archivos, puedes simplemente elegir el nombre de la carpeta en "ELIJA UN ARCHIVO" y escoger "SI" en "¿Attachment Personalizado?"
+
+ACLARACIÓN: El código maneja Attachments Genéricos y Attachments Personalizados por separado, mas no una mezcla de ambos. Es decir que o todos los archivos a adjuntar son los mismos para todos los destinatarios, o cada destinatario tiene su propia versión para cada uno de los archivos adjuntos.
+
+
+IG:
+@cmi_ecu
+@zambranoema2001
+
+WEB:
+cmiolimpiadas.com
+
+MAILS:
+cmiolimpiadas@gmail.com
