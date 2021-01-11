@@ -161,10 +161,10 @@ def run(Greeting,Subject,Template_name,Attachments_base,Attachment_personalizado
             #en caso de tener una base de datos de gran tamaño, el delay puede ser usado para controlar la cantidad
             #de correo enviados cada hora 
             #esta función la saque de un proyecto que trabajé en paralelo a este (enfocado en tener un servidor encendido 24 horas al dia
-            # enviando correos) pero decidí mantenerla aqui pues podria resultar util
+            # enviando correos) pero decidí mantenerla aqui pues podría resultar util
             
-            #dudo que sea el caso, por tanto el delay que puse es de 0 segundos, pero usted puede cambiarlo
-            continuar, ammount_sent=envio_masivo(200,10,hora_de_inicio,ammount_sent)
+            #dudo que sea el caso, por tanto el delay que puse es de 2 segundos, pero usted puede cambiarlo
+            continuar, ammount_sent=envio_masivo(200,2,hora_de_inicio,ammount_sent)
             if not continuar:
                 #print("\n\n-------------YA NO HAY MAS CORREOS!!!!!!!!!!!!!!!!-------------")
                 break
