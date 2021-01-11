@@ -138,7 +138,7 @@ def read_info():
                                                                                                                     #| DEBEN COINCIDIR
     except:                                                                                                         #| RECOMIENDO USAR UNA DIFERENTE
                                                                                                                    #|
-        datos=["","","","","","",""]                                                                              #|
+        datos=["","","","","","","","",""]                                                                         #|
                                                                                                                  #|
     return datos                                                                                                #|
                                                                                                                #|
