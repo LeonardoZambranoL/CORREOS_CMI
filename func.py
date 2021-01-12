@@ -115,7 +115,7 @@ def send(app,smtp, Template_contents, Destinatarios, dir_Register, Template, Ema
                     registro.write("\t" + "correcto\n\n")
                     attachment_content = attachment.read()
                     msg.add_attachment(attachment_content, maintype=maintype, subtype=subtype,
-                                       filename=att.split("/")[-1][0:-4])
+                                       filename=att.split("/")[-1])
                 app.update()
                 
             # envio de correo
